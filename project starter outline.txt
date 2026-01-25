@@ -1,0 +1,29 @@
+Project Starter Outline
+
+1) Data structure
+   - US_STATE_LAWS.tsv: 50 states, yearly 1991–2019, 136 binary law indicators + LAWTOTAL.
+   - School-shooting data: aggregate to state–year (counts, injured, killed, weapon/location attributes).
+   - Join keys: STATE, YEAR; handle post-2019 incidents via carry-forward, exclusion, or sensitivity checks.
+
+2) Policy exposure metrics
+   - Overall stringency: use LAWTOTAL (and z-score variant).
+   - Sub-indices (examples): prohibitors; background checks; assault weapons/magazines; carry/concealed; child access/storage; DV/ERPO.
+   - Drop all-zero columns in analysis window to avoid multicollinearity.
+
+3) Modeling strategy
+   - State–year panel models: negative binomial for counts; linear/ordered for severity proxies.
+   - Fixed effects: state and year; cluster SEs by state.
+   - Test implementation lags (0–12 months); include policy indices or individual laws as needed.
+
+4) Identification & design
+   - Staggered adoption: use modern DID/event-study estimators; avoid negative weights.
+   - Rare policies (e.g., MICROSTAMP, GVRO): consider synthetic control at state level.
+
+5) Simulation / counterfactuals
+   - Fit baseline model, then toggle individual laws or increase indices/LAWTOTAL.
+   - Project changes in expected incident frequency and severity under alternative policy packages.
+
+6) Practical steps
+   - Build merged panel dataset.
+   - Define 3–5 theory-driven policy indices; pre-register planned tests.
+   - Run baseline and lagged robustness checks; document sensitivity to post-2019 law handling.
