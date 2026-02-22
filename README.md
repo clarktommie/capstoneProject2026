@@ -26,8 +26,8 @@ Template (multiline):
 
 ```bash
 python src/convert_enrollment_wide_to_long.py \
-    data/<input_range>.csv \
-    data/<input_range>_long.csv
+    data/<file_name>.csv \
+    data/<new_file_name>_long.csv
 ```
 
 Concrete example:
