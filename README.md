@@ -35,7 +35,7 @@ Concrete example:
 ```bash
 python src/convert_enrollment_wide_to_long.py \
     data/2007_2016.csv \
-    data/2007_2016_long.csv
+    data/2007_2016_long.csvn>_long.csv
 ```
 
 Output columns:
