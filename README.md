@@ -96,3 +96,10 @@ If Plotly does not render inline in your environment, use:
 ```python
 import plotly.io as pio
 pio.renderers.default = "notebook_connected"  # fallback: "browser"
+```
+And then render with:
+
+```python
+display(HTML(fig.to_html()))
+```
+
