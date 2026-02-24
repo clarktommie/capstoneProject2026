@@ -69,3 +69,30 @@ For full diagnostics and methodology details, see `notebooks/about_the_data.ipyn
 
 - Python `>=3.12`
 - Main dependencies are in `pyproject.toml` (pandas, plotly, matplotlib, supabase client, dotenv).
+
+## About the Data Notebook Updates
+
+The `notebooks/about_the_data.ipynb` notebook now includes presentation-ready diagnostics and architecture visuals to support the question:
+
+**Are school shooting risks affected by policy/laws, and can we lower risk by changing laws?**
+
+### Added visuals
+
+- Entity Relationship Diagram (ERD) using Plotly
+- Table row count comparison
+- Column data type breakdown (categorical vs numeric vs datetime)
+- Missing value percentage by column
+- Missing value heatmap
+- Year coverage timeline (data availability by year)
+- Duplicate record check summary
+- Enrollment dataset year-range alignment visualization
+- Data ingestion pipeline flow diagram (ETL overview)
+- Data source provenance chart
+
+### Rendering note (Plotly in VS Code/Jupyter)
+
+If Plotly does not render inline in your environment, use:
+
+```python
+import plotly.io as pio
+pio.renderers.default = "notebook_connected"  # fallback: "browser"
