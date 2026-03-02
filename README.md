@@ -1,105 +1,151 @@
 # School Shootings Capstone Project
 
-This repository contains data work for analyzing K-12 school shooting trends and related policy context.
+This repository contains data engineering and exploratory modeling work for analyzing K-12 school shooting risk trends and their relationship to firearm policy context across U.S. states.
 
-## Current Focus
+## Project Objective
 
-- Prepared enrollment data for downstream analysis and database loading.
-- Converted wide, year-based enrollment columns into a normalized long format.
-- Documented indexing for faster year-based queries.
+Primary research question:
 
-## Enrollment Conversion Script
+Can school shooting risk be explained in part by policy/law environment, and does policy variation align with lower risk over time?
 
-Use the reusable script below to convert enrollment CSV files for any year range:
+## Current Analysis Scope
+
+The current workflow (documented in `notebooks/about_the_data.ipynb`) includes:
+
+- Data integration across incident, shooter, victim, weapon, enrollment, and law-policy tables.
+- Data quality diagnostics (schema checks, missingness, duplicate checks, year coverage validation).
+- Enrollment anomaly review and correction for longitudinal comparability.
+- Construction of state-year analytic panels.
+- Incident normalization as rate per 100,000 students.
+- Early policy linkage analysis (e.g., background check indicator joins and correlations).
+- Distribution diagnostics motivating count-model choices (zero-heavy, right-skewed, overdispersed outcomes).
+
+## Data Pipeline Summary
+
+1. Extract source tables from Supabase in paginated pulls.
+2. Standardize keys and datatypes (`State`, `Year`) across sources.
+3. Transform enrollment data from wide year columns to long format where needed.
+4. Build derived tables (national enrollment trend, incident rate metrics, state-year merged views).
+5. Run QA checks before downstream modeling.
+
+## Key Data Quality Notes
+
+- A structural break in enrollment was detected around 2019 during anomaly review.
+- Likely driver: inconsistent NCES reporting universe/template differences across eras.
+- Corrective action: harmonized enrollment derivations to improve comparability for longitudinal rate analysis.
+
+## Repository Structure
+
+```text
+.
+├── docs/
+├── images/
+├── notebooks/
+│   ├── about_the_data.ipynb
+│   ├── data_conversion.ipynb
+│   ├── shootings_exploration.ipynb
+│   └── ...
+├── outputs/
+│   └── plotly_insights/
+└── src/
+    ├── convert_enrollment_wide_to_long.py
+    ├── plotly_insights.py
+    ├── simulate_law.py
+    ├── streamlit_app.py
+    └── ...
+```
+
+## Environment Setup
+
+Requirements:
+
+- Python `>=3.12`
+- Dependencies listed in `pyproject.toml`
+
+Using `uv`:
 
 ```bash
-python3 src/convert_enrollment_wide_to_long.py <input_csv> <output_csv>
+uv sync
+uv run python -m ipykernel install --user --name schoolshootings
+```
+
+Using `pip`:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -U pip
+pip install -e .
+```
+
+## Configuration
+
+Create a `.env` file with your Supabase credentials (already expected by notebook/script imports):
+
+```env
+SUPABASE_URL=...
+SUPABASE_KEY=...
+```
+
+## How To Run
+
+Launch notebooks:
+
+```bash
+jupyter lab
+```
+
+Run enrollment conversion script:
+
+```bash
+python src/convert_enrollment_wide_to_long.py <input_csv> <output_csv>
 ```
 
 Example:
 
 ```bash
-python3 src/convert_enrollment_wide_to_long.py data/1987_1995.csv data/1987_1995_long.csv
+python src/convert_enrollment_wide_to_long.py data/2007_2016.csv data/2007_2016_long.csv
 ```
 
-Template (multiline):
-
-```bash
-python src/convert_enrollment_wide_to_long.py \
-    data/<file_name>.csv \
-    data/<new_file_name>_long.csv
-```
-
-Concrete example:
-
-```bash
-python src/convert_enrollment_wide_to_long.py \
-    data/2007_2016.csv \
-    data/2007_2016_long.csvn>_long.csv
-```
-
-Output columns:
+Expected output columns:
 
 - `school_id`
 - `state`
 - `year`
 - `total_students`
 
-## Database Note
+## Notebook of Record: About the Data
 
-For large enrollment tables, create a year index:
+`notebooks/about_the_data.ipynb` is the primary technical notebook for:
 
-```sql
-CREATE INDEX idx_enrollment_year
-ON enrollment_all_schools (year);
-```
+- Source table profiling and integration checks.
+- Visual diagnostics (ERD, row counts, dtypes, missingness, timeline coverage, ETL diagram).
+- Incident-rate construction and validation.
+- Initial policy merge diagnostics and model-readiness checks.
 
-## Data Quality Notes
-
-An enrollment anomaly review identified a sharp drop in 2019 that did not match prior trend behavior.
-
-- **Observed issue:** abrupt structural break in national enrollment totals.
-- **Likely cause:** inconsistent NCES reporting universe across source eras (template and inclusion-rule differences).
-- **Corrective action:** rebuilt derived enrollment tables using a consistent download template and harmonized inclusion criteria.
-- **Current status:** resulting longitudinal series is more comparable across years for incident-rate analysis.
-
-For full diagnostics and methodology details, see `notebooks/about_the_data.ipynb`.
-
-## Environment
-
-- Python `>=3.12`
-- Main dependencies are in `pyproject.toml` (pandas, plotly, matplotlib, supabase client, dotenv).
-
-## About the Data Notebook Updates
-
-The `notebooks/about_the_data.ipynb` notebook now includes presentation-ready diagnostics and architecture visuals to support the question:
-
-**Are school shooting risks affected by policy/laws, and can we lower risk by changing laws?**
-
-### Added visuals
-
-- Entity Relationship Diagram (ERD) using Plotly
-- Table row count comparison
-- Column data type breakdown (categorical vs numeric vs datetime)
-- Missing value percentage by column
-- Missing value heatmap
-- Year coverage timeline (data availability by year)
-- Duplicate record check summary
-- Enrollment dataset year-range alignment visualization
-- Data ingestion pipeline flow diagram (ETL overview)
-- Data source provenance chart
-
-### Rendering note (Plotly in VS Code/Jupyter)
-
-If Plotly does not render inline in your environment, use:
+If Plotly does not render inline in your environment:
 
 ```python
 import plotly.io as pio
 pio.renderers.default = "notebook_connected"  # fallback: "browser"
 ```
-And then render with:
 
-```python
-display(HTML(fig.to_html()))
-```
+## Modeling Status
 
+Work in progress:
+
+- State-year count modeling (Negative Binomial candidates).
+- Two-way fixed effects specifications (state + year).
+- Severity-focused alternatives (victims per incident and aggregated fatalities).
+
+These sections are exploratory and being refined into a reproducible modeling pipeline.
+
+## Reproducibility Notes
+
+- Prefer frozen outputs in `outputs/` for downstream modeling instead of repeated live pulls.
+- Keep state/year key normalization consistent before merges.
+- Apply duplicate and missingness checks after every major join.
+
+## Disclaimer
+
+This project analyzes sensitive violence-related data for research and policy insight purposes only. Interpret findings with caution; associations are not causal claims without stronger identification design.
