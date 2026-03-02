@@ -158,3 +158,59 @@ These sections are exploratory and being refined into a reproducible modeling pi
 ## Disclaimer
 
 This project analyzes sensitive violence-related data for research and policy insight purposes only. Interpret findings with caution; associations are not causal claims without stronger identification design.
+
+## Model Refinement: Dispersion and Final Specification
+
+### Initial Specification
+
+The baseline model used a Negative Binomial regression to account for overdispersion in incident counts. This is standard for count data where the variance may exceed the mean.
+
+### Dispersion Evaluation
+
+To formally assess dispersion, the NB2 parameterization (`smf.negativebinomial()`) was estimated, which allows the overdispersion parameter (alpha) to be estimated from the data.
+
+Results indicated:
+
+- Estimated alpha ≈ 0.03  
+- Alpha statistically indistinguishable from zero at conventional levels  
+- Maximum likelihood optimization did not fully converge  
+
+An alpha value near zero implies that the variance closely matches the mean after controlling for:
+
+- State fixed effects  
+- Year fixed effects  
+- Enrollment exposure (log offset)  
+
+This suggests that overdispersion is largely absorbed by the fixed-effects structure.
+
+### Convergence Considerations
+
+Because:
+
+- The NB2 model did not fully converge  
+- The estimated alpha was near zero  
+- The specification includes high-dimensional fixed effects  
+
+the Negative Binomial model provides no empirical advantage over a Poisson model in this context.
+
+### Final Specification
+
+The final model is a:
+
+**Poisson regression with:**
+- State fixed effects (`C(State)`)  
+- Year fixed effects (`C(Year)`)  
+- Log enrollment offset  
+- State-clustered standard errors  
+
+Clustering at the state level allows for:
+
+- Serial correlation within states over time  
+- Arbitrary heteroskedasticity  
+- Robust inference under mild variance misspecification  
+
+Importantly, Poisson with clustered standard errors remains consistent even if the equidispersion assumption is violated.
+
+### Conclusion
+
+Given negligible estimated overdispersion and convergence instability in NB2, the Poisson specification with state-clustered standard errors is the statistically stable and methodologically appropriate final model.
