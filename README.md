@@ -35,6 +35,23 @@ The current workflow (documented in `notebooks/about_the_data.ipynb`) includes:
 - Likely driver: inconsistent NCES reporting universe/template differences across eras.
 - Corrective action: harmonized enrollment derivations to improve comparability for longitudinal rate analysis.
 
+## Potential Bias: Sample Restriction and Comparability
+
+## Sample Restriction (1987–Present)
+
+The panel is restricted to 1987 onward due to a structural break in the underlying data-generating process prior to 1987.
+
+Pre-1987 observations are not comparable in measurement, reporting coverage, and policy codification. Including those years would violate panel homogeneity assumptions and introduce non-structural noise into fixed effects and dynamic specifications.
+
+This restriction is not outcome-based filtering. It is a data consistency adjustment to ensure:
+
+- Comparable incident classification
+- Consistent enrollment coverage
+- Reliable policy coding
+- Stable variance structure
+
+All models are therefore estimated on the 1987–present balanced policy-enrollment panel.
+
 ## Repository Structure
 
 ```text
