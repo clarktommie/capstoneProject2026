@@ -1,4 +1,5 @@
 # School Shootings Capstone Project
+### Authors: Tori-Ana, Tommie, Clara, T Foster, Alli, & Diya
 
 This repository contains data engineering and exploratory modeling work for analyzing K-12 school shooting risk trends and their relationship to firearm policy context across U.S. states.
 
@@ -67,15 +68,6 @@ Using `uv`:
 ```bash
 uv sync
 uv run python -m ipykernel install --user --name schoolshootings
-```
-
-Using `pip`:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -U pip
-pip install -e .
 ```
 
 ## Configuration
