@@ -56,6 +56,21 @@ def fetch_all_rows(supabase_client, table_name: str, page_size: int = 1000) -> p
     return pd.DataFrame(rows)
 
 
+def fetch_first_available(
+    supabase_client, table_names: list[str], page_size: int = 1000
+) -> pd.DataFrame:
+    last_error: Exception | None = None
+    for table_name in table_names:
+        try:
+            return fetch_all_rows(supabase_client, table_name, page_size=page_size)
+        except Exception as exc:
+            last_error = exc
+
+    if last_error is not None:
+        raise last_error
+    raise ValueError("No table names were provided.")
+
+
 def compute_slope(values: pd.Series) -> float:
     y = values.dropna().tolist()
     n = len(y)
@@ -431,10 +446,15 @@ def main() -> None:
 
     supabase_client = create_client(supabase_url, supabase_key)
 
-    incident_rate_df = fetch_all_rows(supabase_client, "incident_rate_per_100k")
-    enrollment_df = fetch_all_rows(supabase_client, "national_enrollment_trend")
-    incident_state_year_df = fetch_all_rows(supabase_client, "incident_state_year")
-
+    incident_rate_df = fetch_first_available(
+        supabase_client, ["incident_rate_per_100k", "incident_rate_per_100k_mv"]
+    )
+    enrollment_df = fetch_first_available(
+        supabase_client, ["national_enrollment_trend", "national_enrollment_trend_mv"]
+    )
+    incident_state_year_df = fetch_first_available(
+        supabase_client, ["incident_state_year", "incident_state_year_mv"]
+    )
     national_fig, national_insights = build_national_chart(incident_rate_df, enrollment_df)
     state_fig, state_insights = build_state_quadrant_chart(incident_state_year_df)
 

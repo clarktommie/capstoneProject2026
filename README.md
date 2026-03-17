@@ -214,3 +214,35 @@ Importantly, Poisson with clustered standard errors remains consistent even if t
 ### Conclusion
 
 Given negligible estimated overdispersion and convergence instability in NB2, the Poisson specification with state-clustered standard errors is the statistically stable and methodologically appropriate final model.
+
+## 🎬 Manim Setup (Linux)
+
+### Install system dependencies
+sudo apt update && sudo apt install -y \
+    libcairo2-dev \
+    libpango1.0-dev \
+    pkg-config \
+    python3-dev \
+    ffmpeg
+
+### Create and activate environment
+uv venv manim-env
+source manim-env/bin/activate
+
+### Install Manim
+uv pip install manim
+
+### Verify dependencies
+pkg-config --modversion cairo
+pkg-config --modversion pango
+
+### Test render
+echo 'from manim import *
+
+class Test(Scene):
+    def construct(self):
+        text = Text("Manim Works")
+        self.play(Write(text))
+        self.wait()' > test.py
+
+manim -pql test.py Test
