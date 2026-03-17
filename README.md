@@ -247,4 +247,6 @@ class Test(Scene):
 
 manim -pql test.py Test
 manim -pql src/manim_gapminder.py StateBubbleMotion
+uv run manim -pqh src/manim_bias_story.py BiasBeforeAfterStory
+
 

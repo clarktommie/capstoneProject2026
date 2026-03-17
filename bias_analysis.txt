@@ -1,0 +1,69 @@
+- Population normalization
+  incident_rate_per_100k = incident_count / total_students * 100000
+  src/manim_gapminder.py build_state_year_panel(); notebooks/about_the_data.ipynb state-year merge section; notebooks/05_visualization_and_outputs.ipynb state-year merge section
+  makes large and small states comparable
+
+- Enrollment exposure offset
+  offset=merged_df_table["log_enrollment"] with log_enrollment = np.log(total_students)
+  notebooks/about_the_data.ipynb TWFE / Poisson / Negative Binomial model sections
+  models incident risk relative to student population instead of raw counts alone
+
+- Full state-year panel construction
+  pd.MultiIndex.from_product([selected_states, range(year_min, year_max + 1)]) followed by reindex(full_index)
+  src/manim_gapminder.py build_state_year_panel()
+  prevents comparisons from being driven only by observed non-missing state-year rows
+
+- Zero-incident year preservation
+  merged["incident_count"] = merged["incident_count"].fillna(0)
+  src/manim_gapminder.py build_state_year_panel(); notebooks/about_the_data.ipynb merged_df_table construction; notebooks/05_visualization_and_outputs.ipynb merged_df_table construction
+  avoids bias from dropping state-years with no incidents
+
+- Enrollment interpolation for missing years
+  panel["total_students"] = panel.groupby("State")["total_students"].transform(lambda s: s.interpolate(limit_direction="both"))
+  src/manim_gapminder.py build_state_year_panel()
+  reduces distortion from gaps in enrollment values across years
+
+- Reliable year restriction
+  filtering to Year >= 1987
+  src/manim_gapminder.py build_state_year_panel(); notebooks/about_the_data.ipynb incident_counts/enrollment sections; notebooks/05_visualization_and_outputs.ipynb incident_counts/enrollment sections
+  removes earlier years that are treated as less comparable in the project code/notebook workflow
+
+- Valid state-code filtering
+  incident_df["State"].str.match(r"^[A-Z]{2}$", na=False)
+  src/manim_gapminder.py build_state_year_panel(); notebooks/about_the_data.ipynb incident_df_from_1987 cleaning section
+  removes malformed or non-standard state values that would skew state comparisons
+
+- Key harmonization across datasets
+  enrollment_df["state"].str.upper(); map full state names to STATE_ABBREV/state_abbrev; rename year to Year
+  src/manim_gapminder.py build_state_year_panel(); notebooks/about_the_data.ipynb enrollment harmonization section; notebooks/05_visualization_and_outputs.ipynb enrollment harmonization section
+  reduces merge bias from inconsistent state and year identifiers
+
+- Duplicate state-year enrollment control
+  sort_values("total_students", ascending=False).drop_duplicates(["State", "Year"])
+  src/manim_gapminder.py build_state_year_panel(); notebooks/about_the_data.ipynb enrollment preprocessing; notebooks/05_visualization_and_outputs.ipynb enrollment preprocessing
+  prevents duplicate enrollment rows from inflating or distorting rates
+
+- Required-field filtering
+  dropna(subset=["State", "Year", "total_students"]) and dropna(subset=["school_id", "total_students"])
+  src/manim_gapminder.py build_state_year_panel(); src/convert_enrollment_wide_to_long.py
+  removes incomplete rows that would create unreliable merges or rates
+
+- Inner merge for aligned national series
+  r.merge(e, on="year", how="inner").dropna(subset=["year", "rate_per_100k"])
+  src/plotly_insights.py build_national_chart()
+  keeps national trend comparisons restricted to years with both enrollment and incident-rate data
+
+- State fixed effects
+  formula includes C(State)
+  notebooks/about_the_data.ipynb TWFE model sections
+  controls for persistent differences across states
+
+- Year fixed effects
+  formula includes C(Year)
+  notebooks/about_the_data.ipynb TWFE model sections
+  controls for nationwide year-specific shifts that affect all states
+
+- Clustered inference by state
+  fit(cov_type="cluster", cov_kwds={"groups": merged_df_table["State"]})
+  notebooks/about_the_data.ipynb clustered Poisson section
+  reduces bias in inference from within-state dependence over time
