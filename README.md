@@ -246,3 +246,5 @@ class Test(Scene):
         self.wait()' > test.py
 
 manim -pql test.py Test
+manim -pql src/manim_gapminder.py StateBubbleMotion
+

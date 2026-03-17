@@ -280,7 +280,8 @@ class StateBubbleMotion(Scene):
 
         x_min = float(panel["log_students"].min())
         x_max = float(panel["log_students"].max())
-        x_padding = max(0.08, (x_max - x_min) * 0.06)
+        x_span = max(x_max - x_min, 1e-6)
+        x_padding = max(0.08, x_span * 0.08)
         x_range_min = x_min - x_padding
         x_range_max = x_max + x_padding
 
@@ -297,11 +298,14 @@ class StateBubbleMotion(Scene):
 
         axes_y_length = 5.5
         y_data = panel["incident_rate_per_100k"]
-        y_min = float(y_data.quantile(0.05))
-        y_max = float(y_data.quantile(0.95))
-        y_step = max((y_max - y_min) / 5, 0.1)
-        y_range_min = y_min * 0.9
-        y_range_max = y_max * 1.1
+        # Use robust limits so a few extreme years do not flatten visible motion.
+        y_min = float(y_data.quantile(0.02))
+        y_max = float(y_data.quantile(0.98))
+        y_span = max(y_max - y_min, 1e-6)
+        y_padding = max(0.22, y_span * 0.08)
+        y_range_min = max(0.0, y_min - y_padding)
+        y_range_max = y_max + y_padding
+        y_step = max((y_range_max - y_range_min) / 5, 0.1)
 
         title = Text(
             "All 50 States Over Time",
@@ -323,6 +327,23 @@ class StateBubbleMotion(Scene):
             axis_config={"color": "#64748B", "font_size": 20},
             tips=False,
         ).shift(DOWN * 0.45)
+
+        plot_left = axes.c2p(x_range_min, y_range_min)[0]
+        plot_right = axes.c2p(x_range_max, y_range_min)[0]
+        plot_bottom = axes.c2p(x_range_min, y_range_min)[1]
+        plot_top = axes.c2p(x_range_min, y_range_max)[1]
+        def bounded_center(log_students: float, rate: float, radius: float) -> np.ndarray:
+            target = axes.c2p(log_students, rate)
+            x_margin = radius
+            y_margin = radius
+            bounded_x = min(max(target[0], plot_left + x_margin), plot_right - x_margin)
+            bounded_y = min(max(target[1], plot_bottom + y_margin), plot_top - y_margin)
+            # Guard against degenerate axis spans where margins exceed plot width/height.
+            if plot_right - plot_left <= 2 * x_margin:
+                bounded_x = (plot_left + plot_right) / 2
+            if plot_top - plot_bottom <= 2 * y_margin:
+                bounded_y = (plot_bottom + plot_top) / 2
+            return np.array([bounded_x, bounded_y, 0.0])
 
         x_label = Text("State enrollment", font_size=20, color="#334155").next_to(
             axes.x_axis, DOWN, buff=0.4
@@ -424,16 +445,16 @@ class StateBubbleMotion(Scene):
         year_text = Text(
             str(year_min),
             font_size=196,
-            color="#CBD5E1",
-            fill_opacity=0.22,
+            color="#94A3B8",
+            fill_opacity=0.32,
         ).move_to(axes.c2p((x_range_min + x_range_max) / 2, y_range_max * 0.48))
         year_text.add_updater(
             lambda mob: mob.become(
                 Text(
                     str(int(round(year_tracker.get_value()))),
                     font_size=196,
-                    color="#CBD5E1",
-                    fill_opacity=0.22,
+                    color="#94A3B8",
+                    fill_opacity=0.32,
                 ).move_to(axes.c2p((x_range_min + x_range_max) / 2, y_range_max * 0.48))
             )
         )
@@ -477,7 +498,9 @@ class StateBubbleMotion(Scene):
                 fill_color=default_fill_color,
                 fill_opacity=0.66,
             )
-            bubble.move_to(axes.c2p(initial_log_students, initial_rate))
+            bubble.move_to(
+                bounded_center(initial_log_students, initial_rate, initial_radius)
+            )
             bubble_map[state] = bubble
 
             def bubble_updater(mob: Circle, state_name: str = state) -> Circle:
@@ -508,7 +531,8 @@ class StateBubbleMotion(Scene):
                     display_radius = radius
 
                 mob.set(width=display_radius * 2, height=display_radius * 2)
-                mob.move_to(axes.c2p(log_students, rate))
+                # Keep bubbles fully visible inside the plot area.
+                mob.move_to(bounded_center(log_students, rate, display_radius))
                 mob.set_style(
                     fill_color=fill_color,
                     fill_opacity=fill_opacity,
@@ -578,6 +602,7 @@ class StateBubbleMotion(Scene):
             font_size=16,
             color="#0F172A",
         ).scale_to_fit_width(intro_box.width - 0.24).move_to(intro_box.get_center())
+        intro_focus_states = {state for state in focal_states[:5] if state in bubble_map}
 
         checkpoint_box = RoundedRectangle(
             corner_radius=0.16,
@@ -636,7 +661,11 @@ class StateBubbleMotion(Scene):
         )
         self.play(FadeIn(year_text), FadeIn(bubble_mobs), FadeIn(label_mobs), run_time=2.4)
         self.play(FadeIn(intro_box), FadeIn(intro_text, shift=UP * 0.08), run_time=1.2)
-        self.wait(1.5)
+        highlight_states.clear()
+        highlight_states.update(intro_focus_states)
+        self.play(highlight_strength.animate.set_value(1.0), run_time=0.7)
+        self.wait(1.0)
+        self.play(highlight_strength.animate.set_value(0.55), run_time=0.6)
         self.play(FadeOut(intro_box), FadeOut(intro_text), run_time=1.1)
 
         phase_1_end = float(min(year_min + (year_max - year_min) * 0.35, year_max))
@@ -645,20 +674,20 @@ class StateBubbleMotion(Scene):
         self.play(year_tracker.animate.set_value(phase_1_end), run_time=12, rate_func=linear)
         checkpoint_text.become(
             Text(
-                "Notice how large states cluster to the right.",
+                "The watchlist states stay elevated as time advances.",
                 font_size=15,
                 color="#0F172A",
             ).move_to(checkpoint_box.get_center())
         )
         narrative_text.become(
             Text(
-                "The largest-enrollment states stay\nanchored on the right.",
+                "Follow them across the chart:\nstill higher-rate than most peers.",
                 font_size=15,
                 color="#0F172A",
                 line_spacing=0.82,
             ).move_to(narrative_box.get_center())
         )
-        first_pause_states = {state for state in large_states_for_story if state in bubble_map}
+        first_pause_states = {state for state in intro_focus_states if state in bubble_map}
         highlight_states.clear()
         highlight_states.update(first_pause_states)
         self.play(FadeIn(VGroup()), run_time=0.1)
@@ -724,6 +753,37 @@ class StateBubbleMotion(Scene):
         highlight_states.clear()
         self.play(year_tracker.animate.set_value(float(year_max)), run_time=10, rate_func=linear)
         self.wait(2.0)
+
+        followup_box = RoundedRectangle(
+            corner_radius=0.16,
+            width=5.1,
+            height=0.9,
+            stroke_color="#CBD5E1",
+            stroke_width=1.8,
+            fill_color="#FFFFFF",
+            fill_opacity=0.97,
+        ).move_to(axes.c2p(x_range_min + 0.75, y_range_max * 0.88))
+        followup_text = Text(
+            "Follow-up: those same watchlist states still stand out near the top.",
+            font_size=15,
+            color="#0F172A",
+        ).scale_to_fit_width(followup_box.width - 0.28).move_to(followup_box.get_center())
+        highlight_states.clear()
+        highlight_states.update(intro_focus_states)
+        self.play(
+            FadeIn(followup_box),
+            FadeIn(followup_text, shift=UP * 0.05),
+            highlight_strength.animate.set_value(1.0),
+            run_time=1.0,
+        )
+        self.wait(1.8)
+        self.play(
+            FadeOut(followup_box),
+            FadeOut(followup_text),
+            highlight_strength.animate.set_value(0.0),
+            run_time=0.8,
+        )
+        highlight_states.clear()
 
         final_banner = RoundedRectangle(
             corner_radius=0.18,
