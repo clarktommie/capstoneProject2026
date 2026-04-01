@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Model Summary</title>
+  <style>
+    :root {
+      --bg: #f6f3ec;
+      --paper: #fffdf8;
+      --ink: #1f2933;
+      --muted: #52606d;
+      --line: #d9d2c3;
+      --accent: #8d3b2f;
+      --accent-soft: #f2e3de;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      background: linear-gradient(180deg, #efe8db 0%, var(--bg) 100%);
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 40px 20px 64px;
+    }
+
+    .hero, section {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(31, 41, 51, 0.06);
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 12px;
+      line-height: 1.15;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      color: var(--accent);
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--accent-soft);
+      padding-bottom: 8px;
+      margin-bottom: 18px;
+    }
+
+    p { margin: 0 0 14px; }
+
+    .sub {
+      color: var(--muted);
+      max-width: 60ch;
+    }
+
+    .models {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px;
+      background: #fffaf2;
+    }
+
+    .card h3 {
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+    }
+
+    .label {
+      display: inline-block;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    li + li {
+      margin-top: 8px;
+    }
+
+    .figure {
+      margin-bottom: 28px;
+    }
+
+    .figure:last-child {
+      margin-bottom: 0;
+    }
+
+    .figure img {
+      width: 100%;
+      display: block;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: white;
+    }
+
+    .caption {
+      margin-top: 10px;
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Project Model Summary</h1>
+      <p class="sub">We examine school shooting incidents across U.S. states over time and compare those patterns with state firearm policies. Our main questions are whether policies are linked to how often incidents happen and whether they are linked to how harmful those incidents are when they occur.</p>
+    </div>
+
+    <section>
+      <h2>SECTION 1 — Overview</h2>
+      <p>We use state-by-year data from 1987 forward, along with public school enrollment, to study incident rates and levels of harm. Across the main models, the clearest pattern is a strong national rise in recent years, while most policy effects remain small or unclear.</p>
+    </section>
+
+    <section>
+      <h2>SECTION 2 — Models Used</h2>
+      <div class="models">
+        <div class="card">
+          <div class="label">Model 1</div>
+          <h3>Negative Binomial Model for Incident Count</h3>
+          <p><strong>Used for:</strong> estimating how often school shooting incidents happen in each state and year.</p>
+          <p><strong>Question answered:</strong> Are policy changes linked to more or fewer incidents?</p>
+          <p><strong>Target:</strong> incident count.</p>
+        </div>
+        <div class="card">
+          <div class="label">Model 2</div>
+          <h3>Negative Binomial Model for Total Victims</h3>
+          <p><strong>Used for:</strong> estimating overall harm across each state and year.</p>
+          <p><strong>Question answered:</strong> Are policy changes linked to more or fewer total victims?</p>
+          <p><strong>Target:</strong> total victims.</p>
+        </div>
+        <div class="card">
+          <div class="label">Model 3</div>
+          <h3>Gamma Model for Victims per Incident</h3>
+          <p><strong>Used for:</strong> estimating how severe incidents are once an incident has already happened.</p>
+          <p><strong>Question answered:</strong> Are policy changes linked to higher or lower harm per incident?</p>
+          <p><strong>Target:</strong> victims per incident.</p>
+        </div>
+        <div class="card">
+          <div class="label">Check Model</div>
+          <h3>Poisson Model with State-Clustered Errors</h3>
+          <p><strong>Used for:</strong> checking whether the main pattern still appears under a stricter comparison.</p>
+          <p><strong>Question answered:</strong> Do the broad policy and time patterns still point in the same direction?</p>
+          <p><strong>Target:</strong> incident count.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>SECTION 3 — Key Findings</h2>
+      <ul>
+        <li>The clearest result is a strong national rise in incident rates in the later years, especially from 2018 through 2024.</li>
+        <li>The same late-year rise also appears when we look at total victims, not just incident count.</li>
+        <li>In the main incident-count model, we do not see clear evidence that any single policy measure changed incident counts on its own.</li>
+        <li>In the total-victims model, the policy results are again mostly unclear.</li>
+        <li>In the victims-per-incident model, the policy related to K-12 settings stands out most clearly and is linked to higher harm per incident.</li>
+        <li>The background check measure comes close in a few places, but not strongly enough to treat it as a firm conclusion.</li>
+        <li>Overall, the national time pattern is much stronger than the short-run policy pattern.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>SECTION 4 — Visual Evidence</h2>
+
+      <div class="figure">
+        <img src="./project_model_summary_assets/incidents_per_100k_students.png" alt="School shooting incidents per 100k students over time">
+        <p class="caption">This chart shows the national incident rate over time. The sharp rise in the later years supports our main takeaway that recent time trends stand out more than individual policy changes.</p>
+      </div>
+
+      <div class="figure">
+        <img src="./project_model_summary_assets/national_enrollment_trend.png" alt="U.S. public school enrollment over time">
+        <p class="caption">This chart shows the school enrollment trend used as the population base for comparing states and years. It helps explain why the models look at rates, not just raw counts.</p>
+      </div>
+
+      <div class="figure">
+        <img src="../images/model_twfe.png" alt="Incident model coefficient chart">
+        <p class="caption">This chart shows the main incident-count model. Most policy estimates sit close to the no-clear-change line, while the later-year effects are much more prominent.</p>
+      </div>
+
+      <div class="figure">
+        <img src="../images/model_severity_twfe.png" alt="Total victims model coefficient chart">
+        <p class="caption">This chart shows the model for total victims. It tells the same broad story: later years matter more than most policy terms.</p>
+      </div>
+
+      <div class="figure">
+        <img src="../images/model_incident_severity.png" alt="Victims per incident model coefficient chart">
+        <p class="caption">This chart shows the model for harm per incident. Here, the policy related to K-12 settings is the clearest policy signal and is associated with higher victims per incident.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>SECTION 5 — Final Takeaways</h2>
+      <ul>
+        <li>The strongest pattern is a nationwide increase in school shooting risk in recent years.</li>
+        <li>We do not see strong, consistent evidence that most single policies changed incident counts on their own.</li>
+        <li>The same is true when the outcome is total victims: the later time period is clearer than most policy effects.</li>
+        <li>One policy measure stands out in the incident-only severity model, where the policy related to K-12 settings is linked to higher harm per incident.</li>
+        <li>For decision-making, the main message is that time trends dominate the results.</li>
+      </ul>
+      <p class="small">This summary uses the same results and visuals shown in our analysis.</p>
+    </section>
+  </div>
+</body>
+</html>

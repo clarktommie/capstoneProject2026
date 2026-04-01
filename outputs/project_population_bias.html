@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Addressing Population Bias</title>
+  <style>
+    :root {
+      --bg: #f3eee4;
+      --panel: #fffdf7;
+      --panel-alt: #f8f1e4;
+      --ink: #23313c;
+      --muted: #5b6976;
+      --line: #d8cfbf;
+      --accent: #924227;
+      --accent-soft: #f0ddd4;
+      --gold: #c99638;
+      --shadow: 0 18px 38px rgba(35, 49, 60, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at top left, rgba(201, 150, 56, 0.1), transparent 28%),
+        linear-gradient(180deg, #efe6d7 0%, var(--bg) 100%);
+    }
+
+    .deck {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 18px 80px;
+    }
+
+    .slide {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .slide.hero {
+      padding: 44px 36px;
+      background:
+        linear-gradient(135deg, rgba(146, 66, 39, 0.08), rgba(201, 150, 56, 0.14)),
+        var(--panel);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .kicker {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+
+    .slide-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .slide-no {
+      min-width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent), #bd6140);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      font-weight: bold;
+      box-shadow: 0 10px 22px rgba(146, 66, 39, 0.22);
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 12px;
+      line-height: 1.12;
+    }
+
+    h1 {
+      font-size: clamp(2.3rem, 5vw, 3.6rem);
+      color: var(--accent);
+    }
+
+    h2 {
+      font-size: clamp(1.55rem, 2.5vw, 2rem);
+      color: var(--accent);
+    }
+
+    h3 {
+      font-size: 1.04rem;
+      color: var(--accent);
+    }
+
+    p {
+      margin: 0 0 12px;
+      line-height: 1.58;
+    }
+
+    .lead {
+      font-size: 1.08rem;
+      color: var(--muted);
+      max-width: 66ch;
+    }
+
+    .statement {
+      margin-top: 16px;
+      padding: 18px 20px;
+      border-left: 5px solid var(--accent);
+      background: #fff7f0;
+      border-radius: 16px;
+      font-size: 1.05rem;
+    }
+
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .card {
+      background: var(--panel-alt);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .card.alt {
+      background: #fff9f2;
+    }
+
+    .mini-title {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    li + li {
+      margin-top: 8px;
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .compare-box {
+      padding: 20px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #fffdf8 0%, #f8f1e6 100%);
+    }
+
+    .compare-box strong {
+      color: var(--accent);
+    }
+
+    .step {
+      position: relative;
+      padding-top: 8px;
+    }
+
+    .step-num {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), #c36c4b);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    figure {
+      margin: 0;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 10px 26px rgba(35, 49, 60, 0.06);
+    }
+
+    figure img {
+      width: 100%;
+      display: block;
+      background: #fff;
+    }
+
+    figcaption {
+      padding: 14px 16px 16px;
+      color: var(--muted);
+      font-size: 0.97rem;
+      line-height: 1.45;
+    }
+
+    .callout {
+      margin-top: 18px;
+      padding: 18px 20px;
+      background: linear-gradient(135deg, rgba(146, 66, 39, 0.08), rgba(201, 150, 56, 0.1));
+      border: 1px solid var(--line);
+      border-radius: 22px;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    @media (max-width: 920px) {
+      .grid-2,
+      .grid-3,
+      .grid-4,
+      .compare {
+        grid-template-columns: 1fr;
+      }
+
+      .slide-head {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck">
+    <section class="slide hero">
+      <div class="eyebrow">Slide 1</div>
+      <h1>Addressing Population Bias</h1>
+      <p class="lead">This part of our presentation explains how we made comparisons fair across states with very different student populations. Our goal was to focus on <strong>risk</strong>, not just raw totals.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head">
+        <div>
+          <div class="kicker">Slide 2</div>
+          <h2>The Problem</h2>
+          <p class="lead">Raw incident counts create a built-in bias. States with more students naturally have more chances for incidents, so higher totals do not automatically mean higher risk.</p>
+        </div>
+        <div class="slide-no">02</div>
+      </div>
+      <div class="statement">
+        If we only look at total incidents, large states will always look worse, even when the actual level of risk may be the same.
+      </div>
+      <div class="compare">
+        <div class="compare-box">
+          <div class="mini-title">Large State</div>
+          <p><strong>More students</strong> means more schools, more activity, and more opportunities for incidents to occur.</p>
+          <p>That can push the raw incident count up even when the state is not more dangerous on a student-by-student basis.</p>
+        </div>
+        <div class="compare-box">
+          <div class="mini-title">Small State</div>
+          <p><strong>Fewer students</strong> means fewer opportunities for incidents in raw totals.</p>
+          <p>That can make a small state look safer in a simple count, even when the risk per student is actually higher.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head">
+        <div>
+          <div class="kicker">Slide 3</div>
+          <h2>Why This Matters</h2>
+          <p class="lead">Without an adjustment for population size, the analysis could confuse state size with actual risk.</p>
+        </div>
+        <div class="slide-no">03</div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>What would go wrong for large states</h3>
+          <ul>
+            <li>Large states would appear worse simply because they have more students.</li>
+            <li>Higher totals would be read as higher danger, even when those totals mainly reflect state size.</li>
+            <li>This is the core form of <strong>population bias</strong> in the project.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>What would go wrong for small states</h3>
+          <ul>
+            <li>Small states could look safer than they really are because their totals start from a smaller student base.</li>
+            <li>The comparison would reward or punish states for size rather than for risk.</li>
+            <li>That would create an unfair state ranking from the start.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout">
+        <strong>Main point:</strong> if population size is not handled directly, the results can be driven by how big a state is instead of how likely incidents are.
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head">
+        <div>
+          <div class="kicker">Slide 4</div>
+          <h2>How We Fixed It</h2>
+          <p class="lead">We corrected the bias by moving from raw counts to enrollment-adjusted rates.</p>
+        </div>
+        <div class="slide-no">04</div>
+      </div>
+      <div class="grid-3">
+        <div class="card step">
+          <div class="step-num">1</div>
+          <h3>We attached student enrollment to each state and year</h3>
+          <p>The project joined incident counts to enrollment using the shared fields <strong>State</strong> and <strong>Year</strong>.</p>
+        </div>
+        <div class="card step">
+          <div class="step-num">2</div>
+          <h3>We converted counts into rates</h3>
+          <p>Instead of asking “How many incidents happened?”, we asked “How many incidents happened relative to the number of students?”</p>
+        </div>
+        <div class="card step">
+          <div class="step-num">3</div>
+          <h3>We based comparison on risk</h3>
+          <p>This changed the comparison from raw totals to a fairer measure of how likely incidents were in each state-year setting, regardless of state size.</p>
+        </div>
+      </div>
+      <div class="statement">
+        In plain terms, we adjusted for how many students were in each state. That shifts the focus from total incidents to incident likelihood.
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head">
+        <div>
+          <div class="kicker">Slide 5</div>
+          <h2>Risk vs Size</h2>
+          <p class="lead">A core strength of the project is that it separates state size from state risk.</p>
+        </div>
+        <div class="slide-no">05</div>
+      </div>
+      <div class="grid-2">
+        <div class="card alt">
+          <h3>Size</h3>
+          <ul>
+            <li>Size refers to how many students are in the state.</li>
+            <li>Large states naturally have more exposure simply because more students are present.</li>
+            <li>Size should explain the opportunity for incidents, not define the level of risk by itself.</li>
+          </ul>
+        </div>
+        <div class="card alt">
+          <h3>Risk</h3>
+          <ul>
+            <li>Risk refers to incidents relative to the student population.</li>
+            <li>A large state can have a high count but still a lower risk once enrollment is considered.</li>
+            <li>A small state can have fewer incidents but still a higher risk relative to its student population.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout">
+        Because every state is put on the same population-adjusted basis, no state is automatically made to look better or worse simply because it is bigger or smaller.
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head">
+        <div>
+          <div class="kicker">Slide 6</div>
+          <h2>Supporting Adjustments</h2>
+          <p class="lead">The project did more than divide by enrollment. It also checked for other places where bias could enter and added steps to keep the comparison fair.</p>
+        </div>
+        <div class="slide-no">06</div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Reporting and coverage bias</h3>
+          <p>The project identified a break in the enrollment data and rebuilt the series using the same source template and the same inclusion rules across years.</p>
+          <p><strong>Why this matters:</strong> if the enrollment base changes because of reporting rules instead of real student counts, the risk measure becomes distorted.</p>
+        </div>
+        <div class="card">
+          <h3>Historical comparability bias</h3>
+          <p>The project restricted the main comparison to 1987 forward so incident classification, enrollment coverage, and policy coverage were more consistent.</p>
+          <p><strong>Why this matters:</strong> fair comparison requires a time period where the data is measured in a similar way.</p>
+        </div>
+        <div class="card">
+          <h3>Selection bias risk</h3>
+          <p>The project used one row for each state in each year, including years with zero incidents.</p>
+          <p><strong>Why this matters:</strong> states with fewer incidents are still fully represented instead of disappearing from the comparison.</p>
+        </div>
+        <div class="card">
+          <h3>Matching bias risk</h3>
+          <p>State names were standardized, one enrollment value was kept for each state-year, and the merge was checked before rates were calculated.</p>
+          <p><strong>Why this matters:</strong> a fair rate depends on pairing each incident record with the correct student population, not the wrong one or a missing one.</p>
+        </div>
+        <div class="card">
+          <h3>Population bias in the main comparison</h3>
+          <p>The project kept enrollment inside the main comparison itself so the final comparison stayed tied to student population rather than raw totals.</p>
+          <p><strong>Why this matters:</strong> the bias correction is built into the comparison from start to finish, not added as an afterthought.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head">
+        <div>
+          <div class="kicker">Slide 7</div>
+          <h2>Visual Example</h2>
+          <p class="lead">These visuals show why enrollment matters and how the project separates population size from population-adjusted risk.</p>
+        </div>
+        <div class="slide-no">07</div>
+      </div>
+      <div class="grid-3">
+        <figure>
+          <img src="./project_population_bias_assets/national_enrollment_trend.png" alt="National enrollment trend">
+          <figcaption>This chart shows that the student population changes over time. Because the population base is not fixed, the project could not rely on raw counts alone.</figcaption>
+        </figure>
+        <figure>
+          <img src="./project_population_bias_assets/incidents_per_100k_students.png" alt="Incidents per 100k students">
+          <figcaption>This chart shows the project’s preferred framing: incidents relative to student enrollment. It turns a raw total into a fairer measure of risk.</figcaption>
+        </figure>
+        <figure>
+          <img src="./project_population_bias_assets/incident_rate_distribution.png" alt="Incident rate distribution">
+          <figcaption>This chart shows how the final comparison measure is spread across state-year records. The key point is that every state is placed on the same enrollment-adjusted scale.</figcaption>
+        </figure>
+      </div>
+      <div class="footer-note">Taken together, these visuals show the logic of the correction: first account for student population, then compare states on the same basis.</div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head">
+        <div>
+          <div class="kicker">Slide 8</div>
+          <h2>Key Takeaway</h2>
+          <p class="lead">The project is designed so that population size does not decide the outcome of the comparison.</p>
+        </div>
+        <div class="slide-no">08</div>
+      </div>
+      <div class="statement">
+        States are compared based on risk, not population size.
+      </div>
+      <div class="grid-2" style="margin-top:18px;">
+        <div class="card">
+          <h3>What this means for the audience</h3>
+          <ul>
+            <li>Large states are not automatically labeled as higher-risk just because they have more students.</li>
+            <li>Small states are not automatically treated as lower-risk just because their totals are smaller.</li>
+            <li>The comparison is built to be fair across states regardless of population size.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Bottom line</h3>
+          <p>Every major adjustment in this part of the project points back to the same idea: remove the advantage or disadvantage created by state size, and compare states on a common risk-based footing.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

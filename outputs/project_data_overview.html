@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Data Overview</title>
+  <style>
+    :root {
+      --bg: #f3efe6;
+      --panel: #fffdf8;
+      --panel-alt: #f8f1e6;
+      --ink: #23303b;
+      --muted: #5b6975;
+      --line: #d9d0c0;
+      --accent: #9c4128;
+      --accent-soft: #f3ddd4;
+      --gold: #d39b38;
+      --shadow: 0 18px 40px rgba(35, 48, 59, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at top left, rgba(211, 155, 56, 0.08), transparent 30%),
+        linear-gradient(180deg, #efe7d8 0%, var(--bg) 100%);
+    }
+
+    .deck {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 18px 80px;
+    }
+
+    .slide {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .slide.hero {
+      padding: 44px 36px;
+      background:
+        linear-gradient(135deg, rgba(156, 65, 40, 0.08), rgba(211, 155, 56, 0.12)),
+        var(--panel);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .slide-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .slide-no {
+      min-width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent), #c2603f);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      font-weight: bold;
+      box-shadow: 0 10px 22px rgba(156, 65, 40, 0.22);
+    }
+
+    h1, h2, h3, h4 {
+      margin: 0 0 12px;
+      line-height: 1.12;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      color: var(--accent);
+    }
+
+    h2 {
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      color: var(--accent);
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      color: var(--accent);
+    }
+
+    p {
+      margin: 0 0 12px;
+      line-height: 1.55;
+    }
+
+    .lead {
+      font-size: 1.08rem;
+      color: var(--muted);
+      max-width: 64ch;
+    }
+
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .card {
+      background: var(--panel-alt);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .card strong {
+      color: var(--ink);
+    }
+
+    .stat {
+      background: linear-gradient(180deg, #fffaf1 0%, #fff 100%);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+      text-align: left;
+    }
+
+    .stat .value {
+      display: block;
+      font-size: 2rem;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    li + li {
+      margin-top: 8px;
+    }
+
+    .figure-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    figure {
+      margin: 0;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 10px 26px rgba(35, 48, 59, 0.06);
+    }
+
+    figure img {
+      width: 100%;
+      display: block;
+      background: #fff;
+    }
+
+    figcaption {
+      padding: 14px 16px 16px;
+      color: var(--muted);
+      font-size: 0.97rem;
+      line-height: 1.45;
+    }
+
+    .kicker {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    @media (max-width: 900px) {
+      .grid-2,
+      .grid-3,
+      .grid-4,
+      .figure-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .slide-head {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck">
+    <section class="slide hero">
+      <div class="eyebrow">Slide 1</div>
+      <h1>Capstone Project 2026</h1>
+      <p class="lead"><strong>Data Overview</strong></p>
+      <p class="lead">In this section, we introduce the data behind our project: what tables we use, how the information is organized, how the pieces connect, and what broad patterns are already visible before any deeper analysis begins.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head">
+        <div>
+          <div class="kicker">Slide 2</div>
+          <h2>What Data We Are Using</h2>
+          <p class="lead">Our project combines event records, people and weapon details, student enrollment, and state policy information.</p>
+        </div>
+        <div class="slide-no">02</div>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Incident table</h3>
+          <p>This is the main event table. Each row represents a school shooting incident and includes the date, school, location, and victim counts.</p>
+        </div>
+        <div class="card">
+          <h3>Shooter table</h3>
+          <p>This table adds shooter details linked to each incident, such as age, gender, race, school affiliation, and outcome.</p>
+        </div>
+        <div class="card">
+          <h3>Victim table</h3>
+          <p>This table records victim-level details, including injury type, age, gender, race, and school affiliation.</p>
+        </div>
+        <div class="card">
+          <h3>Weapon table</h3>
+          <p>This table captures weapon information for each incident, including weapon type, caliber, and any extra description available.</p>
+        </div>
+        <div class="card">
+          <h3>Enrollment data</h3>
+          <p>This table stores student counts by state and year so we can compare incident activity against the size of the student population.</p>
+        </div>
+        <div class="card">
+          <h3>Policy data</h3>
+          <p>These are state-by-year policy tables covering areas like background checks, waiting periods, registration, child access laws, and K-12 settings.</p>
+        </div>
+      </div>
+      <p class="footer-note">We also use prepared year-level summary tables for national enrollment and national incident rates over time.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head">
+        <div>
+          <div class="kicker">Slide 3</div>
+          <h2>Data Structure</h2>
+          <p class="lead">The data is organized around a few shared fields that make the tables easy to connect.</p>
+        </div>
+        <div class="slide-no">03</div>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Main event fields</h3>
+          <ul>
+            <li><strong>Incident_ID:</strong> the unique ID for one event</li>
+            <li><strong>Year, Month, Day, Date:</strong> when the event happened</li>
+            <li><strong>School, City, State:</strong> where the event took place</li>
+            <li><strong>Victims_Killed, Victims_Wounded, Number_Victims:</strong> how many people were harmed</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Detail fields</h3>
+          <ul>
+            <li><strong>School_Affiliation:</strong> how a shooter or victim was connected to the school</li>
+            <li><strong>Age, Gender, Race:</strong> background details when available</li>
+            <li><strong>Weapon_Type, Weapon_Caliber:</strong> what kind of weapon was involved</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Context fields</h3>
+          <ul>
+            <li><strong>State and Year:</strong> the keys used to connect incidents, enrollment, and policies</li>
+            <li><strong>total_students:</strong> student enrollment in a state and year</li>
+            <li><strong>year:</strong> the field used in national trend tables</li>
+          </ul>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:16px;">
+        <div class="card">
+          <h3>What the values look like</h3>
+          <p>Most of the core tables are made up of labels and categories such as state names, school affiliation, injury type, and weapon type.</p>
+        </div>
+        <div class="card">
+          <h3>Where numbers appear</h3>
+          <p>Numbers mainly show up in fields like year, month, day, number of victims, and student enrollment.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head">
+        <div>
+          <div class="kicker">Slide 4</div>
+          <h2>Data Size and Coverage</h2>
+          <p class="lead">The project combines detailed event tables with broader state-by-year context.</p>
+        </div>
+        <div class="slide-no">04</div>
+      </div>
+      <div class="grid-4">
+        <div class="stat">
+          <span class="value">3,136</span>
+          <strong>incident rows</strong>
+          <p>50 columns</p>
+        </div>
+        <div class="stat">
+          <span class="value">3,542</span>
+          <strong>shooter rows</strong>
+          <p>8 columns</p>
+        </div>
+        <div class="stat">
+          <span class="value">8,370</span>
+          <strong>victim rows</strong>
+          <p>6 columns</p>
+        </div>
+        <div class="stat">
+          <span class="value">3,168</span>
+          <strong>weapon rows</strong>
+          <p>4 columns</p>
+        </div>
+      </div>
+      <div class="grid-3" style="margin-top:16px;">
+        <div class="stat">
+          <span class="value">2,548</span>
+          <strong>enrollment rows</strong>
+          <p>3 columns: state, year, total students</p>
+        </div>
+        <div class="stat">
+          <span class="value">1966–2025</span>
+          <strong>overall incident range</strong>
+          <p>Main state-year comparisons focus on 1987–2025</p>
+        </div>
+        <div class="stat">
+          <span class="value">51</span>
+          <strong>state entries</strong>
+          <p>The cleaned state list includes Washington, D.C.</p>
+        </div>
+      </div>
+      <p class="footer-note">The policy tables are compact state-by-year tables with 3 columns each, and their sizes range from 315 rows to 2,295 rows depending on the policy.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head">
+        <div>
+          <div class="kicker">Slide 5</div>
+          <h2>How Data Is Stored in Supabase</h2>
+          <p class="lead">Supabase is the database where we keep the project tables in one place. Instead of one large file, the data is organized into smaller connected tables.</p>
+        </div>
+        <div class="slide-no">05</div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>How we organize it</h3>
+          <ul>
+            <li>Separate tables hold incidents, shooters, victims, and weapons.</li>
+            <li>Enrollment is stored by state and year.</li>
+            <li>Policy tables are also stored by state and year.</li>
+            <li>Prepared summary tables track national enrollment and national incident rates over time.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Why this helps</h3>
+          <ul>
+            <li>It keeps detailed event records separate from larger state-level context.</li>
+            <li>It makes it easier to connect the right information at the right level.</li>
+            <li>It supports both event-level detail and national trend views.</li>
+          </ul>
+        </div>
+      </div>
+      <figure style="margin-top:18px;">
+        <img src="../images/ETL_Overview.png" alt="ETL overview diagram">
+        <figcaption>This diagram shows the flow from raw sources into Supabase, then through quality checks and summary tables. It highlights that the project uses a structured storage process rather than a single raw spreadsheet.</figcaption>
+      </figure>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head">
+        <div>
+          <div class="kicker">Slide 6</div>
+          <h2>How the Data Connects</h2>
+          <p class="lead">The tables link together through shared IDs and shared location-and-time fields.</p>
+        </div>
+        <div class="slide-no">06</div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Incident-level links</h3>
+          <ul>
+            <li><strong>Incident_ID</strong> connects the incident table to shooter, victim, and weapon details.</li>
+            <li>This lets us move from one event to the people and weapons connected to that event.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>State-year links</h3>
+          <ul>
+            <li><strong>State + Year</strong> connects incidents to enrollment.</li>
+            <li><strong>State + Year</strong> also connects incidents to the policy tables.</li>
+            <li>This lets us place each event pattern inside a broader state and time context.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="figure-grid" style="margin-top:18px;">
+        <figure>
+          <img src="../images/entity_relationship.png" alt="Entity relationship diagram">
+          <figcaption>This visual shows the main table layout. The incident table sits at the center, with shooter, victim, and weapon tables branching out from it.</figcaption>
+        </figure>
+        <figure>
+          <img src="../images/PolicyRelationshipDiagram.png" alt="Policy relationship diagram">
+          <figcaption>This visual shows how the policy tables connect through the shared fields <strong>state</strong> and <strong>year</strong>. That shared structure is what allows the policy tables to line up with the incident and enrollment data.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head">
+        <div>
+          <div class="kicker">Slide 7</div>
+          <h2>What the Data Looks Like</h2>
+          <p class="lead">These visuals give a quick picture of table size, column makeup, and where detail is more limited.</p>
+        </div>
+        <div class="slide-no">07</div>
+      </div>
+      <div class="figure-grid">
+        <figure>
+          <img src="../images/row_count_comparison.png" alt="Row count comparison chart">
+          <figcaption>This chart compares the size of the main event tables. The victim table is the largest, which makes sense because one incident can involve more than one victim.</figcaption>
+        </figure>
+        <figure>
+          <img src="../images/column_data_types.png" alt="Column data type chart">
+          <figcaption>This chart shows that most fields in the core tables are labels or categories rather than numbers. The data is mainly descriptive, with a smaller set of count and date-related fields.</figcaption>
+        </figure>
+        <figure>
+          <img src="../images/missing_values.png" alt="Missing values chart">
+          <figcaption>This chart shows that detailed victim and weapon fields are less complete than the main incident fields. That means the strongest coverage is at the event, time, and place level.</figcaption>
+        </figure>
+        <figure>
+          <img src="./project_data_overview_assets/incident_rate_distribution.png" alt="Incident rate distribution chart">
+          <figcaption>This chart shows how incident rates are spread across state-year records. Most observations are clustered at the lower end, with fewer high-rate cases.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head">
+        <div>
+          <div class="kicker">Slide 8</div>
+          <h2>Key Patterns in the Data</h2>
+          <p class="lead">Before any deeper analysis, a few broad patterns are already visible in the data itself.</p>
+        </div>
+        <div class="slide-no">08</div>
+      </div>
+      <div class="figure-grid">
+        <figure>
+          <img src="./project_data_overview_assets/incidents_per_100k_students.png" alt="Incidents per 100k students over time">
+          <figcaption>This chart shows the national incident rate over time. The later years stand out clearly compared with much of the earlier period.</figcaption>
+        </figure>
+        <figure>
+          <img src="./project_data_overview_assets/national_enrollment_trend.png" alt="National enrollment trend over time">
+          <figcaption>This chart shows the national enrollment trend over time. It provides the population context used for year-to-year comparisons.</figcaption>
+        </figure>
+      </div>
+      <div class="grid-2" style="margin-top:18px;">
+        <div class="card">
+          <h3>Patterns we can see directly</h3>
+          <ul>
+            <li>The data covers several decades, which makes long-term time patterns visible.</li>
+            <li>The later years show a higher national incident rate than much of the earlier timeline.</li>
+            <li>The number of records differs a lot across tables because one incident can link to several victims, shooters, or weapons.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Patterns in structure</h3>
+          <ul>
+            <li>Most of the core data is descriptive rather than purely numeric.</li>
+            <li>Detailed victim and weapon information is less complete than core incident location and date information.</li>
+            <li>State and year act as the bridge between event data, enrollment, and policy context.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head">
+        <div>
+          <div class="kicker">Slide 9</div>
+          <h2>Why This Data Matters</h2>
+          <p class="lead">This dataset is useful because it combines detailed event records with broader context about time, place, student population, and policy environment.</p>
+        </div>
+        <div class="slide-no">09</div>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <h3>It captures the event itself</h3>
+          <p>We can see when an incident happened, where it happened, and how many people were harmed.</p>
+        </div>
+        <div class="card">
+          <h3>It adds supporting detail</h3>
+          <p>We can connect incidents to shooter, victim, and weapon records instead of keeping all detail in one crowded table.</p>
+        </div>
+        <div class="card">
+          <h3>It adds state-year context</h3>
+          <p>We can place incident activity next to student enrollment and policy information for the same state and year.</p>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:16px;">
+        <div class="card">
+          <h3>Why this supports our project</h3>
+          <ul>
+            <li>It supports both individual event detail and broader trend views.</li>
+            <li>It is organized in a way that makes cross-table connections clear.</li>
+            <li>It gives us a practical foundation for explaining both the data and the results to an audience.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Bottom line</h3>
+          <p>We are not working from a single flat file. We are working from a connected data system that brings together incidents, people, weapons, enrollment, and policy context in a way that is clear enough to present and strong enough to support the rest of the project.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
