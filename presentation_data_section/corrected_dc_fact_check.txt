@@ -1,0 +1,9 @@
+FACT CHECK
+2023 national risk with D.C.: 0.774338
+2023 national risk without D.C.: 0.749005
+absolute difference: 0.025333
+percent difference: 3.382223%
+peak year with D.C.: 2023
+peak year without D.C.: 2023
+post-2018 average with D.C.: 0.480869
+post-2018 average without D.C.: 0.472549
